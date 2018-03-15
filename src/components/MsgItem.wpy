@@ -1,0 +1,133 @@
+<style>
+.msgitem {
+  display: flex;
+  margin: 34rpx 18rpx;
+  position: relative;
+}
+
+.msgitem.right {
+  flex-direction: row-reverse;
+}
+
+.avatar {
+  width: 80rpx;
+  height: 80rpx;
+}
+
+.text {
+  border-radius: 8rpx;
+  padding: 14rpx;
+  color: #090909;
+  font-size: 32rpx;
+  max-width: 500rpx;
+  word-break: break-all;
+}
+
+.text.left {
+  margin-left: 20rpx;
+  background-color: white;
+}
+
+.text.right {
+  margin-right: 20rpx;
+  background-color: #a2e563;
+}
+
+.text.left::after {
+  content: "";
+  position: absolute;
+  left: 88rpx;
+  top: 28rpx;
+  border: 12rpx solid transparent;
+  border-right-color: white;
+  border-left: 0;
+}
+
+.text.right::after {
+  content: "";
+  position: absolute;
+  right: 88rpx;
+  top: 28rpx;
+  border: 12rpx solid transparent;
+  border-left-color: #a2e563;
+  border-right: 0;
+}
+
+.image {
+  border-radius: 8rpx;
+  max-width: 280rpx;
+  max-height: 280rpx;
+  min-height: 103rpx;
+}
+
+.image.left {
+  margin-left: 20rpx;
+}
+
+.image.right {
+  margin-right: 20rpx;
+}
+
+.weui-loading.left {
+  position: absolute;
+  left: 120rpx;
+  top: 20rpx;
+}
+
+.weui-loading.right {
+  position: absolute;
+  right: 120rpx;
+  top: 20rpx;
+}
+</style>
+
+<template>
+<view class="msgitem {{item.fromMe?'right':''}}" id="id{{index}}">
+  <image class="avatar" mode="aspectFill" src="{{item.avatar}}" />
+  <view wx:if="{{item.type == 0}}" class="text {{item.fromMe?'right':'left'}}">
+    {{item.content}}
+  </view>
+  <block wx:elif="{{item.type == 1}}">
+    <image class="image {{item.fromMe?'right':'left'}}" style="width:{{imgWidth}}rpx;height:{{imgHegith}}rpx" mode="aspectFill" lazy-load="true" src="{{item.content}}" bindtap="bindViewImage" bindload="bindLoadImage" binderror="bondLoadError" hidden="{{!loadImgSuccess}}"
+    />
+    <view wx:if="{{!loadImgSuccess}}" class="weui-loading {{item.fromMe?'right':'left'}}" />
+  </block>
+</view>
+</template>
+
+<script>
+import wepy from 'wepy'
+
+export default class MsgItem extends wepy.component {
+  data = {
+    loadImgSuccess: false,
+    imgWidth: 100,
+    imgHegith: 100
+  }
+  props = {
+    item: {},
+    index: {}
+  }
+  methods = {
+    bindLoadImage(e) {
+      this.loadImgSuccess = true
+      let originSize = e.detail
+      if (originSize.width >= originSize.height) {
+        this.imgWidth = 280
+        this.imgHegith = originSize.height / originSize.width * 280
+      } else {
+        this.imgHegith = 280
+        this.imgWidth = originSize.width / originSize.height * 280
+      }
+    },
+    bondLoadError(e) {
+      this.item.content = '/imgs/placeholder.png'
+    },
+    bindViewImage(e) {
+      wepy.previewImage({
+        urls: [this.item.content]
+      })
+    }
+  }
+}
+</script>

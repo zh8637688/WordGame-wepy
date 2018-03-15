@@ -1,0 +1,58 @@
+<template>
+<MsgList :messages.sync="messages" @tap.user="bindTap" />
+<ControlBar :selections.sync="selections" @selection.user="bindSelection" />
+</template>
+
+<script>
+import wepy from 'wepy'
+import ControlBar from '@/components/ControlBar'
+import MsgList from '@/components/MsgList'
+
+export default class Index extends wepy.page {
+  components = {
+    ControlBar: ControlBar,
+    MsgList: MsgList
+  }
+
+  data = {
+    messages: [],
+    selections: []
+  }
+
+  methods = {
+    bindSelection(index, e) {
+
+    },
+    bindTap() {
+      this.collapseControlBar(true)
+    }
+  }
+
+  onLoad(options) {
+  }
+
+  activeControlBar(flag) {
+    this.$invoke('ControlBar', 'setActive', flag)
+  }
+
+  collapseControlBar(flag) {
+    this.$invoke('ControlBar', 'setCollapse', flag)
+  }
+
+  enableLoadMore(flag) {
+    this.$invoke('MsgList', 'setEnableLoadMore', flag)
+  }
+
+  stopLoadMore() {
+    this.$invoke('MsgList', 'stopLoadMore')
+  }
+
+  scrollToBottom() {
+    this.$invoke('MsgList', 'scrollToBottom')
+  }
+
+  setSelections(selections) {
+    this.selections = selections
+  }
+}
+</script>

@@ -1,0 +1,79 @@
+<style>
+.controlbar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 70rpx;
+  max-height: 420rpx;
+  width: 100%;
+  background: #f5f5f7;
+  border-top: 1px solid #dadada;
+}
+
+.controlbar .collapseBtn {
+  width: 580rpx;
+  height: 70rpx;
+  line-height: 70rpx;
+  font-size: 56rpx;
+  margin: 20rpx auto;
+}
+
+.controlbar .selection {
+  width: 580rpx;
+  background-color: #a2e563;
+  color: #000;
+  font-size: 30rpx;
+  line-height: 42rpx;
+  word-break: break-all;
+  margin: 30rpx auto;
+  padding-top: 16rpx;
+  padding-bottom: 16rpx;
+  text-align: left;
+  display: flex;
+  justify-content: center;
+}
+</style>
+
+<template>
+<scroll-view class="controlbar" scroll-y="true">
+  <button wx:if="{{!active||collapse||selections.length==0}}" hover-class="hover" class="collapseBtn" disabled="{{!active||selections.length==0}}" bindtap="bindExpand">
+      ‧‧‧
+    </button>
+  <block wx:else>
+    <button wx:for="{{selections}}" wx:key="id" id="{{index}}" hover-class="hover" class="selection" bindtap="bindSelection">{{item}}</button>
+  </block>
+</scroll-view>
+</template>
+
+<script>
+import wepy from 'wepy'
+export default class ControlBar extends wepy.component {
+  data = {
+    active: false,
+    collapse: true
+  }
+  props = {
+    selections: {
+      type: Array,
+      default: []
+    }
+  }
+  methods = {
+    bindExpand: function bindExpand(e) {
+      this.collapse = false
+    },
+    bindSelection: function bindSelection(e) {
+      var index = e.target.id
+      this.$emit('selection', index)
+    }
+  }
+  setCollapse(flag) {
+    this.collapse = flag
+    this.$apply()
+  }
+  setActive(flag) {
+    this.active = flag
+    this.$apply()
+  }
+}
+</script>

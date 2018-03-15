@@ -1,0 +1,68 @@
+<style>
+.msglist {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: #ebebeb;
+}
+</style>
+
+<template>
+<scroll-view class="msglist" scroll-y="true" scroll-into-view="{{scrollInto}}" bindtap="bindTap" bindscrolltoupper="bindUpper">
+  <view class="weui-loadmore" hidden="{{!showLoadMore}}">
+    <view class="weui-loading" />
+    <view class="weui-loadmore__tips">正在加载</view>
+  </view>
+  <repeat for="{{messages}}" key="id" index="index" item="item">
+    <MsgItem :item="item" :index="index"/>
+  </repeat>
+</scroll-view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import MsgItem from '@/components/MsgItem'
+
+export default class MsgList extends wepy.component {
+  enableLoadMore = false
+  components = {
+    MsgItem: MsgItem
+  }
+  data = {
+    scrollInto: '',
+    showLoadMore: false
+  }
+  props = {
+    messages: {
+      type: Array,
+      default: []
+    }
+  }
+  methods = {
+    bindTap() {
+      this.$emit('tap')
+    },
+    bindUpper() {
+      if (this.enableLoadMore && !this.showLoadMore) {
+        this.showLoadMore = true
+        this.$emit('loadMore')
+      }
+    }
+  }
+  scrollToBottom() {
+    if (this.messages.length > 0) {
+      setTimeout(() => {
+        this.scrollInto = 'id' + (this.messages.length - 1)
+        this.$apply()
+      }, 500)
+    }
+  }
+  stopLoadMore() {
+    this.showLoadMore = false
+  }
+  setEnableLoadMore(flag) {
+    this.enableLoadMore = flag
+    this.stopLoadMore()
+  }
+}
+</script>

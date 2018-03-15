@@ -1,0 +1,13 @@
+{
+  "description": "A WePY project",
+  "setting": {
+    "urlCheck": true,
+    "es6": false,
+    "postcss": false,
+    "minified": false
+  },
+  "compileType": "miniprogram",
+  "appid": "wxd25ec1992e331aee",
+  "projectname": "wordgame",
+  "miniprogramRoot": "./dist"
+}
