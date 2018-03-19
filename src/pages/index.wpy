@@ -28,8 +28,7 @@ export default class Index extends wepy.page {
     }
   }
 
-  onLoad(options) {
-  }
+  onLoad(options) {}
 
   activeControlBar(flag) {
     this.$invoke('ControlBar', 'setActive', flag)
@@ -53,6 +52,19 @@ export default class Index extends wepy.page {
 
   setSelections(selections) {
     this.selections = selections
+  }
+
+  pushMessage(message) {
+    message['ani'] = true
+    this.messages.push(message)
+  }
+
+  pushMsgList(msgList) {
+    this.messages = this.messages.concat(msgList)
+  }
+
+  pullMsgList(msgList) {
+    this.messages = msgList.concat(this.messages)
   }
 }
 </script>

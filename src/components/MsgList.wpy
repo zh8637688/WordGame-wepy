@@ -14,7 +14,7 @@
     <view class="weui-loadmore__tips">正在加载</view>
   </view>
   <repeat for="{{messages}}" key="id" index="index" item="item">
-    <MsgItem :item="item" :index="index"/>
+    <MsgItem :item="item" :index="index" />
   </repeat>
 </scroll-view>
 </template>

@@ -79,10 +79,28 @@
   right: 120rpx;
   top: 20rpx;
 }
+
+@keyframes fadeInBottom {
+  from {
+    opacity: 0;
+    transform: translate(0, 50%);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.msgitem.ani {
+  animation-duration: 0.3s;
+  animation-fill-mode: both;
+  animation-name: fadeInBottom;
+}
 </style>
 
 <template>
-<view class="msgitem {{item.fromMe?'right':''}}" id="id{{index}}">
+<view class="msgitem {{item.fromMe?'right':''}} {{item.ani?'ani':''}}" id="id{{index}}">
   <image class="avatar" mode="aspectFill" src="{{item.avatar}}" />
   <view wx:if="{{item.type == 0}}" class="text {{item.fromMe?'right':'left'}}">
     {{item.content}}
