@@ -10,12 +10,22 @@
   border-top: 1px solid #dadada;
 }
 
-.controlbar .collapseBtn {
+.controlbar .disactiveBtn {
   width: 580rpx;
   height: 70rpx;
   line-height: 70rpx;
   font-size: 56rpx;
   margin: 20rpx auto;
+}
+
+.controlbar .collapseBtn {
+  width: 580rpx;
+  height: 70rpx;
+  line-height: 70rpx;
+  font-size: 32rpx;
+  margin: 20rpx auto;
+  background-color: #a2e563;
+  color: #090909
 }
 
 .controlbar .selection {
@@ -36,9 +46,12 @@
 
 <template>
 <scroll-view class="controlbar" scroll-y="true">
-  <button wx:if="{{!active||collapse||selections.length==0}}" hover-class="hover" class="collapseBtn" disabled="{{!active||selections.length==0}}" bindtap="bindExpand">
+  <button wx:if="{{!active||selections.length==0}}" class="disactiveBtn" disabled="true">
       ‧‧‧
     </button>
+  <button wx:elif="{{collapse}}" hover-class="hover" class="collapseBtn" bindtap="bindExpand">
+    回 复
+  </button>
   <block wx:else>
     <button wx:for="{{selections}}" wx:key="id" id="{{index}}" hover-class="hover" class="selection" bindtap="bindSelection">{{item}}</button>
   </block>
