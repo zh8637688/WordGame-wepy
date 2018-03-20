@@ -17,6 +17,7 @@
   "author": "zh8637688@163.com",
   "license": "MIT",
   "dependencies": {
+    "promise-polyfill": "^7.1.0",
     "wepy": "^1.6.0",
     "wepy-async-function": "^1.4.4",
     "wepy-com-toast": "^1.0.2"

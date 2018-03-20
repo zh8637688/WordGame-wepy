@@ -72,20 +72,34 @@ export default class extends wepy.app {
     userInfo: null
   }
 
-  onLaunch() {
+  constructor() {
+    super()
+    this.use('promisify')
+  }
+
+  async onLaunch() {
+    let that = this
+    let res = await wepy.getSetting()
+    if (!res.authSetting['scope.userInfo']) {
+      await wepy.authorize({
+        scope: 'scope.userInfo'
+      }).then(() => {
+        that._requestUserInfo()
+      }).catch((err) => {
+        console.log(err)
+      })
+    } else {
+      that._requestUserInfo()
+    }
+  }
+
+  async _requestUserInfo() {
+    let res = await wepy.getUserInfo()
+    this.globalData.userInfo = res.userInfo
   }
 
   getUserInfo(cb) {
-    const that = this
-    if (this.globalData.userInfo) {
-      return this.globalData.userInfo
-    }
-    wepy.getUserInfo({
-      success(res) {
-        that.globalData.userInfo = res.userInfo
-        cb && cb(res.userInfo)
-      }
-    })
+    return this.globalData.userInfo
   }
 }
 </script>
