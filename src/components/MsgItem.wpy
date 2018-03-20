@@ -9,6 +9,17 @@
   flex-direction: row-reverse;
 }
 
+.msg-system {
+  display: table;
+  margin: 34rpx auto;
+  max-width: 700rpx;
+  font-size: 28rpx;
+  color: white;
+  border-radius: 8rpx;
+  padding: 4rpx 18rpx;
+  background-color: #cecece;
+}
+
 .avatar {
   width: 80rpx;
   height: 80rpx;
@@ -100,7 +111,10 @@
 </style>
 
 <template>
-<view class="msgitem {{item.fromMe?'right':''}} {{item.ani?'ani':''}}" id="id{{index}}">
+<view wx:if="{{item.type == 3}}" class="msg-system">
+  {{item.content}}
+</view>
+<view wx:else class="msgitem {{item.fromMe?'right':''}} {{item.ani?'ani':''}}" id="id{{index}}">
   <image class="avatar" mode="aspectFill" src="{{item.avatar}}" />
   <view wx:if="{{item.type == 0}}" class="text {{item.fromMe?'right':'left'}}">
     {{item.content}}
