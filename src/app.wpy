@@ -63,7 +63,6 @@ export default class extends wepy.app {
     window: {
       backgroundTextStyle: 'light',
       navigationBarBackgroundColor: '#fff',
-      navigationBarTitleText: 'WeChat',
       navigationBarTextStyle: 'black'
     }
   }
@@ -98,7 +97,7 @@ export default class extends wepy.app {
     this.globalData.userInfo = res.userInfo
   }
 
-  getUserInfo(cb) {
+  getUserInfo() {
     return this.globalData.userInfo
   }
 }
