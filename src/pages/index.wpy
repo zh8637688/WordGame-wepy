@@ -1,12 +1,30 @@
+<style>
+.mask {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.2);
+  color: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+</style>
+
 <template>
 <MsgList :messages.sync="messages" @tap.user="bindTap" />
 <ControlBar :selections.sync="selections" @selection.user="bindSelection" />
+<view wx:if="{{showMask}}" class="mask" @tab="bindMask">
+  {{toast}}
+</view>
 </template>
 
 <script>
 import wepy from 'wepy'
 import ControlBar from '@/components/ControlBar'
 import MsgList from '@/components/MsgList'
+import Director from '../engine/Director.js'
+import EventBus from '../engine/EventBus.js'
 
 export default class Index extends wepy.page {
   components = {
@@ -16,19 +34,69 @@ export default class Index extends wepy.page {
 
   data = {
     messages: [],
-    selections: []
+    selections: [],
+    showMask: false,
+    toast: ''
+  }
+
+  constructor() {
+    super()
+    this.director = new Director()
+    EventBus.registerEvent('ActionFinish')
+    EventBus.registerEvent('SetSelection')
+    EventBus.registerEvent('ChooseSelection')
   }
 
   methods = {
     bindSelection(index, e) {
-
+      EventBus.publish(EventBus.Events.ChooseSelection, {
+        index: index
+      })
     },
     bindTap() {
       this.collapseControlBar(true)
+      this.director.action()
+    },
+    bindMask() {
+      this.showMask = false
     }
   }
 
-  onLoad(options) {}
+  onActionFinish = (arg) => {
+    this.pushMessage({
+      id: arg.script.id,
+      avatar: arg.role.avatar,
+      name: arg.role.name,
+      content: arg.script.content,
+      type: arg.script.type,
+      fromMe: arg.role.type === 1
+    })
+    this.activeControlBar(false)
+    this.$apply()
+  }
+
+  onSetSelection = (arg) => {
+    let selections = arg.selections
+    let selectionString = []
+    for (let idx in selections) {
+      selectionString.push(selections[idx].content)
+    }
+    this.setSelections(selectionString)
+    this.activeControlBar(true)
+    this.$apply()
+  }
+
+  onLoad(options) {
+    EventBus.subscribe(EventBus.Events.ActionFinish, this.onActionFinish)
+    EventBus.subscribe(EventBus.Events.SetSelection, this.onSetSelection)
+    this.director.prepare()
+    this.director.action()
+  }
+
+  onUnload() {
+    EventBus.unsubscribe(EventBus.Events.ActionFinish, this.onActionFinish)
+    EventBus.unsubscribe(EventBus.Events.SetSelection, this.onSetSelection)
+  }
 
   activeControlBar(flag) {
     this.$invoke('ControlBar', 'setActive', flag)
@@ -65,6 +133,11 @@ export default class Index extends wepy.page {
 
   pullMsgList(msgList) {
     this.messages = msgList.concat(this.messages)
+  }
+
+  showMask(toast) {
+    this.toast = toast
+    this.showMask = true
   }
 }
 </script>
