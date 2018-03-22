@@ -52,9 +52,9 @@ export default class MsgList extends wepy.component {
   scrollToBottom() {
     if (this.messages.length > 0) {
       setTimeout(() => {
-        this.scrollInto = 'id' + (this.messages.length - 1)
-        this.$apply()
-      }, 500)
+        // this.$apply要进行脏数据检查，scrollInto不变的情况下不会渲染
+        this.setData('$MsgList$scrollInto', 'id' + (this.messages.length - 1))
+      }, 100)
     }
   }
   stopLoadMore() {
