@@ -1,22 +1,35 @@
 <style>
-.mask {
-  position: fixed;
+page {
+  background-color: #ebebeb;
+}
+
+.toast {
   width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.2);
-  color: black;
+  height: 50rpx;
+  color: #666;
   display: flex;
+  font-size: 30rpx;
   align-items: center;
   justify-content: center;
+  animation: toastAnima 0.6s ease infinite alternate;
+}
+
+@keyframes toastAnima {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 </style>
 
 <template>
 <MsgList :messages.sync="messages" @tap.user="bindTap" />
-<ControlBar :selections.sync="selections" @selection.user="bindSelection" />
-<view wx:if="{{showMask}}" class="mask" @tab="bindMask">
+<view class="toast" @tap="bindTap" hidden="{{!toast}}">
   {{toast}}
 </view>
+<ControlBar :selections.sync="selections" @selection.user="bindSelection" @expand.user="bindExpand" />
 </template>
 
 <script>
@@ -35,7 +48,6 @@ export default class Index extends wepy.page {
   data = {
     messages: [],
     selections: [],
-    showMask: false,
     toast: ''
   }
 
@@ -51,12 +63,13 @@ export default class Index extends wepy.page {
     bindSelection(index, e) {
       EventBus.publish(EventBus.Events.ChooseSelection, index)
     },
+    bindExpand() {
+      this.hideToast()
+      this.scrollToBottom()
+    },
     bindTap() {
       this.collapseControlBar(true)
       this.director.action()
-    },
-    bindMask() {
-      this.showMask = false
     }
   }
 
@@ -70,10 +83,19 @@ export default class Index extends wepy.page {
       fromMe: arg.role.type === 1
     })
     this.activeControlBar(false)
+    this.scrollToBottom()
     this.$apply()
   }
 
   onSetSelection = (arg) => {
+    if (this.needGuide) {
+      this.showToastDelay('点击 “回复” 选择对话')
+      this.needGuide = false
+      wepy.setStorage({
+        key: 'key_no_guide',
+        data: true
+      })
+    }
     let selections = arg.selections
     let selectionString = []
     for (let idx in selections) {
@@ -85,6 +107,7 @@ export default class Index extends wepy.page {
   }
 
   onLoad(options) {
+    this.needGuide = !wepy.getStorageSync('key_no_guide')
     EventBus.subscribe(EventBus.Events.ActionFinish, this.onActionFinish)
     EventBus.subscribe(EventBus.Events.SetSelection, this.onSetSelection)
     this.director.prepare()
@@ -133,9 +156,34 @@ export default class Index extends wepy.page {
     this.messages = msgList.concat(this.messages)
   }
 
-  showMask(toast) {
-    this.toast = toast
-    this.showMask = true
+  showToastDelay(toast) {
+    this.showToast(toast, 1000)
+  }
+
+  showToast(toast, delay) {
+    if (this.toastTimeout) {
+      clearTimeout(this.toastTimeout)
+      this.toastTimeout = 0
+    }
+    if (delay > 0) {
+      this.toastTimeout = setTimeout(() => {
+        this.toast = toast
+        this.toastTimeout = 0
+        this.$apply()
+      }, delay)
+    } else {
+      this.toast = toast
+    }
+  }
+
+  hideToast() {
+    if (this.toastTimeout) {
+      clearTimeout(this.toastTimeout)
+      this.toastTimeout = 0
+    }
+    if (this.toast) {
+      this.toast = ''
+    }
   }
 }
 </script>

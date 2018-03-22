@@ -74,6 +74,7 @@ export default class ControlBar extends wepy.component {
   methods = {
     bindExpand: function bindExpand(e) {
       this.collapse = false
+      this.$emit('expand')
     },
     bindSelection: function bindSelection(e) {
       var index = e.target.id
