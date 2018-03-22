@@ -8,7 +8,7 @@
 </style>
 
 <template>
-<scroll-view class="msglist" scroll-y="true" scroll-into-view="{{scrollInto}}" bindtap="bindTap" bindscrolltoupper="bindUpper">
+<scroll-view class="msglist" scroll-y="true" scroll-with-animation="true" scroll-into-view="{{scrollInto}}" bindtap="bindTap" bindscrolltoupper="bindUpper">
   <view class="weui-loadmore" hidden="{{!showLoadMore}}">
     <view class="weui-loading" />
     <view class="weui-loadmore__tips">正在加载</view>
