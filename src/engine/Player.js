@@ -8,6 +8,12 @@ export default class Player extends Actor {
     let userInfo = wepy.$instance.getUserInfo()
     if (userInfo) {
       role.avatar = userInfo.avatarUrl
+    } else {
+      let onRequestUserInfo = (arg) => {
+        EventBus.unsubscribe('RequestUserInfo', onRequestUserInfo)
+        role.avatar = arg.avatarUrl
+      }
+      EventBus.subscribe('RequestUserInfo', onRequestUserInfo)
     }
   }
 
@@ -18,7 +24,7 @@ export default class Player extends Actor {
     return new Promise((resolve) => {
       let onChooseSelection = (arg) => {
         EventBus.unsubscribe(EventBus.Events.ChooseSelection, onChooseSelection)
-        let selection = script.selections[arg.index]
+        let selection = script.selections[arg]
         script.content = selection.content
         script.goto = selection.goto
         resolve()

@@ -49,9 +49,7 @@ export default class Index extends wepy.page {
 
   methods = {
     bindSelection(index, e) {
-      EventBus.publish(EventBus.Events.ChooseSelection, {
-        index: index
-      })
+      EventBus.publish(EventBus.Events.ChooseSelection, index)
     },
     bindTap() {
       this.collapseControlBar(true)

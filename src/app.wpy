@@ -54,6 +54,7 @@ button {
 <script>
 import wepy from 'wepy'
 import 'wepy-async-function'
+import EventBus from './engine/EventBus.js'
 
 export default class extends wepy.app {
   config = {
@@ -76,25 +77,18 @@ export default class extends wepy.app {
     this.use('promisify')
   }
 
-  async onLaunch() {
-    let that = this
-    let res = await wepy.getSetting()
-    if (!res.authSetting['scope.userInfo']) {
-      await wepy.authorize({
-        scope: 'scope.userInfo'
-      }).then(() => {
-        that._requestUserInfo()
-      }).catch((err) => {
-        console.log(err)
-      })
-    } else {
-      that._requestUserInfo()
-    }
+  onLaunch() {
+    this._requestUserInfo()
   }
 
   async _requestUserInfo() {
-    let res = await wepy.getUserInfo()
-    this.globalData.userInfo = res.userInfo
+    let res = await wepy.getUserInfo().catch((err) => {
+      console.log(err)
+    })
+    if (res) {
+      this.globalData.userInfo = res.userInfo
+      EventBus.publish('RequestUserInfo', res.userInfo)
+    }
   }
 
   getUserInfo() {
