@@ -34,6 +34,6 @@ export default class Actor {
 
   _calcTypingTime(script) {
     let numOfWord = script.content.length
-    return numOfWord * 150
+    return numOfWord * 80
   }
 }
