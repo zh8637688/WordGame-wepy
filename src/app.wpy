@@ -17,8 +17,7 @@ button {
 
 .weui-loadmore {
   width: 65%;
-  margin: 0 auto;
-  padding: 1em;
+  margin: 1em auto;
   line-height: 1.6em;
   font-size: 14px;
   text-align: center;
