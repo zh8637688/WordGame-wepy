@@ -57,6 +57,7 @@ export default class Index extends wepy.page {
     EventBus.registerEvent('ActionFinish')
     EventBus.registerEvent('SetSelection')
     EventBus.registerEvent('ChooseSelection')
+    EventBus.registerEvent('SetTitle')
   }
 
   methods = {
@@ -73,14 +74,20 @@ export default class Index extends wepy.page {
     }
   }
 
+  onSetTitle = arg => {
+    wepy.setNavigationBarTitle({
+      title: arg
+    })
+  }
+
   onActionFinish = (arg) => {
     this.pushMessage({
-      id: arg.script.id,
+      id: arg.line.id,
       avatar: arg.role.avatar,
       name: arg.role.name,
-      content: arg.script.content,
-      type: arg.script.type,
-      fromMe: arg.role.type === 1
+      content: arg.line.content,
+      type: arg.line.contentType ? arg.line.contentType : 0,
+      fromMe: arg.role.fromMe
     })
     this.activeControlBar(false)
     this.scrollToBottom()
@@ -110,6 +117,7 @@ export default class Index extends wepy.page {
     this.needGuide = !wepy.getStorageSync('key_no_guide')
     EventBus.subscribe(EventBus.Events.ActionFinish, this.onActionFinish)
     EventBus.subscribe(EventBus.Events.SetSelection, this.onSetSelection)
+    EventBus.subscribe(EventBus.Events.SetTitle, this.onSetTitle)
     this.director.prepare()
     this.director.action()
   }
@@ -117,6 +125,7 @@ export default class Index extends wepy.page {
   onUnload() {
     EventBus.unsubscribe(EventBus.Events.ActionFinish, this.onActionFinish)
     EventBus.unsubscribe(EventBus.Events.SetSelection, this.onSetSelection)
+    EventBus.unsubscribe(EventBus.Events.SetTitle, this.onSetTitle)
   }
 
   activeControlBar(flag) {

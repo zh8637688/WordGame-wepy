@@ -1,30 +1,47 @@
 import Playwright from './Playwright.js'
 import Actor from './Actor.js'
 import Player from './Player.js'
+import EventBus from './EventBus.js'
 
 export default class Director {
 
   prepare() {
     this.playwright = this._initPlaywright()
-    this.totalChapterCount = this.playwright.getCountOfChapter()
-    this.curChapterID = this._initChapterIdxFromHistory()
-    this.curScriptID = this._initScriptIdxFromHistory()
-    this.scripts = this.playwright.getScriptByChapter(this.curChapterID)
+    this.curChapterIdx = this._initChapterIdxFromHistory()
+    this.curChapter = this.playwright.getChapter(this.curChapterIdx)
+    this.linesOfChapter = this.curChapter ? this.curChapter.lines : undefined
+    this.indexOfLines = this._createIndexOfLines(this.linesOfChapter)
+    this.curLineIdx = this._initLineIdxFromHistory()
     let roleList = this.playwright.getRoleList()
-    this.actors = this._initActors(roleList)
+    this.playerRoleID = this.playwright.getPlayerRoleID()
+    this.actors = this._initActors(roleList, this.playerRoleID)
+    if (this.curChapter) {
+      EventBus.publish(EventBus.Events.SetTitle, this.curChapter.name)
+    }
   }
 
   async action() {
-    if (this.curScriptID < this.scripts.length) {
-      let script = this._getScriptByID(this.curScriptID)
-      await this._dispatchScript(script)
-      this.curScriptID = this._getNextScriptID()
+    if (this.linesOfChapter && this.curLineIdx < this.linesOfChapter.length) {
+      let line = this.linesOfChapter[this.curLineIdx]
+      await this._dispatchLine(line)
+      this.curLineIdx = this._getNextLineIdx()
       this.action()
     }
   }
 
-  restoreHistory() {
-
+  async _dispatchLine(line) {
+    let actor
+    if (line.roleID != undefined) {
+      actor = this._getActorByRoleID(line.roleID)
+    } else if (line.selections) {
+      actor = this._getPlayer()
+    }
+    if (actor) {
+      await actor.prepare(line)
+      actor.act(line)
+    } else {
+      this.action()
+    }
   }
 
   _initPlaywright() {
@@ -35,42 +52,50 @@ export default class Director {
     return 0
   }
 
-  _initScriptIdxFromHistory() {
+  _initLineIdxFromHistory() {
     return 0
   }
 
-  _initActors(roleList) {
+  _initActors(roleList, playerRoleID) {
     let actors = []
-    for (let idx in roleList) {
-      let role = roleList[idx]
-      if (role.type == 0) {
-        actors.push(new Actor(role))
-      } else if (role.type == 1) {
-        actors.push(new Player(role))
+    if (roleList) {
+      for (let idx in roleList) {
+        let role = roleList[idx]
+        if (playerRoleID == role.id) {
+          actors.push(new Player(role))
+        } else {
+          actors.push(new Actor(role))
+        }
       }
     }
     return actors
   }
 
-  _getNextScriptID() {
+  _createIndexOfLines(lines) {
+    let indexMap = new Map()
+    if (lines) {
+      for (let index in lines) {
+        let line = lines[index]
+        if (line.id) {
+          indexMap.set(line.id, index)
+        }
+      }
+    }
+    return indexMap
+  }
+
+  _getNextLineIdx(line) {
     let goto
-    let curScript = this.scripts[this.curScriptID]
-    if (curScript.goto != undefined) {
-      goto = curScript.goto
+    let curLine = this.linesOfChapter[this.curLineIdx]
+    if (curLine.goto != undefined) {
+      goto = this.indexOfLines.get(curLine.goto)
+      if (goto == undefined) {
+        goto = this.curLineIdx + 1
+      }
     } else {
-      goto = this.curScriptID + 1
+      goto = this.curLineIdx + 1
     }
     return goto
-  }
-
-  _getScriptByID(id) {
-    return this.scripts[id]
-  }
-
-  async _dispatchScript(script) {
-    let actor = this._getActorByRoleID(script.roleID)
-    await actor.prepare(script)
-    actor.act(script)
   }
 
   _getRoleByID(roleID) {
@@ -87,6 +112,10 @@ export default class Director {
         return this.actors[idx]
       }
     }
+  }
+
+  _getPlayer() {
+    return this._getActorByRoleID(this.playerRoleID)
   }
 
   onPause() {

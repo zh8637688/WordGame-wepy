@@ -15,28 +15,29 @@ export default class Player extends Actor {
       }
       EventBus.subscribe('RequestUserInfo', onRequestUserInfo)
     }
+    role.fromMe = true
   }
 
-  async prepare(script) {
+  async prepare(line) {
     EventBus.publish(EventBus.Events.SetSelection, {
-      selections: script.selections
+      selections: line.selections
     })
     return new Promise((resolve) => {
       let onChooseSelection = (arg) => {
         EventBus.unsubscribe(EventBus.Events.ChooseSelection, onChooseSelection)
-        let selection = script.selections[arg]
-        script.content = selection.content
-        script.goto = selection.goto
+        let selection = line.selections[arg]
+        line.content = selection.content
+        line.goto = selection.goto
         resolve()
       }
       EventBus.subscribe(EventBus.Events.ChooseSelection, onChooseSelection)
     })
   }
 
-  act(script) {
+  act(line) {
     EventBus.publish(EventBus.Events.ActionFinish, {
       role: this.role,
-      script: script
+      line: line
     })
   }
 }

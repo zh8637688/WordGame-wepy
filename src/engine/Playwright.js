@@ -1,16 +1,21 @@
-import RoleList from '../script/RoleList.js'
 import Scripts from '../script/Scripts.js'
 export default class Playwright {
 
   getRoleList() {
-    return RoleList
+    return Scripts.roles
   }
 
-  getScriptByChapter(chapter) {
-    return Scripts
+  getPlayerRoleID() {
+    return Scripts.playerRoleID
+  }
+
+  getChapter(chapterIndex) {
+    if (chapterIndex < this.getCountOfChapter()) {
+      return Scripts.chapters[chapterIndex]
+    }
   }
 
   getCountOfChapter() {
-    return 1
+    return Scripts.chapters ? Scripts.chapters.length : 0
   }
 }

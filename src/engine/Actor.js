@@ -10,11 +10,11 @@ export default class Actor {
     return this.role.id
   }
 
-  async prepare(script) {
+  async prepare(line) {
     wepy.setNavigationBarTitle({
       title: '对方正在输入...'
     })
-    let delay = this._calcTypingTime(script)
+    let delay = this._calcTypingTime(line)
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve()
@@ -22,18 +22,23 @@ export default class Actor {
     })
   }
 
-  act(script) {
+  act(line) {
     wepy.setNavigationBarTitle({
       title: ''
     })
     EventBus.publish(EventBus.Events.ActionFinish, {
       role: this.role,
-      script: script
+      line: line
     })
   }
 
-  _calcTypingTime(script) {
-    let numOfWord = script.content.length
-    return numOfWord * 80
+  _calcTypingTime(line) {
+    if (line.contentType == undefined || line.contentType == 0) {
+      let numOfWord = line.content.length
+      return numOfWord * 80
+    } else if (line.contentType == 1) {
+      return 800
+    }
+    return 0
   }
 }
