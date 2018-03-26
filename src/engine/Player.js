@@ -3,8 +3,8 @@ import Actor from './Actor.js'
 import EventBus from './EventBus.js'
 
 export default class Player extends Actor {
-  constructor(role) {
-    super(role)
+  constructor(role, director) {
+    super(role, director)
     let userInfo = wepy.$instance.getUserInfo()
     if (userInfo) {
       role.avatar = userInfo.avatarUrl

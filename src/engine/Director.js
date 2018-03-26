@@ -2,6 +2,7 @@ import Playwright from './Playwright.js'
 import Actor from './Actor.js'
 import Player from './Player.js'
 import EventBus from './EventBus.js'
+import wepy from 'wepy'
 
 export default class Director {
 
@@ -15,17 +16,15 @@ export default class Director {
     let roleList = this.playwright.getRoleList()
     this.playerRoleID = this.playwright.getPlayerRoleID()
     this.actors = this._initActors(roleList, this.playerRoleID)
-    if (this.curChapter) {
-      EventBus.publish(EventBus.Events.SetTitle, this.curChapter.name)
-    }
+    this.setTitleWithChapterName()
   }
 
   async action() {
-    if (this.linesOfChapter && this.curLineIdx < this.linesOfChapter.length) {
+    this.stop = false
+    while (!this.stop && this.linesOfChapter && this.curLineIdx < this.linesOfChapter.length) {
       let line = this.linesOfChapter[this.curLineIdx]
       await this._dispatchLine(line)
       this.curLineIdx = this._getNextLineIdx()
-      this.action()
     }
   }
 
@@ -40,8 +39,29 @@ export default class Director {
       await actor.prepare(line)
       actor.act(line)
     } else {
-      this.action()
+      console.log('无效的剧本，未指定演员');
     }
+  }
+
+  setTitleWithChapterName() {
+    if (this.curChapter) {
+      EventBus.publish(EventBus.Events.SetTitle, this.curChapter.name)
+    }
+  }
+
+  stop() {
+    this.stop = true
+  }
+
+  saveHistory() {
+    wepy.setStorage({
+      key: 'key_chapter_index',
+      data: this.curChapterIdx
+    })
+    wepy.setStorage({
+      key: 'key_line_index',
+      data: this.curLineIdx
+    })
   }
 
   _initPlaywright() {
@@ -49,11 +69,21 @@ export default class Director {
   }
 
   _initChapterIdxFromHistory() {
-    return 0
+    let chapterIdx = wepy.getStorageSync('key_chapter_index')
+    if (typeof(chapterIdx) === 'number') {
+      return chapterIdx
+    } else {
+      return 0
+    }
   }
 
   _initLineIdxFromHistory() {
-    return 0
+    let lineIdx = wepy.getStorageSync('key_line_index')
+    if (typeof(lineIdx) === 'number') {
+      return lineIdx
+    } else {
+      return 0
+    }
   }
 
   _initActors(roleList, playerRoleID) {
@@ -62,9 +92,9 @@ export default class Director {
       for (let idx in roleList) {
         let role = roleList[idx]
         if (playerRoleID == role.id) {
-          actors.push(new Player(role))
+          actors.push(new Player(role, this))
         } else {
-          actors.push(new Actor(role))
+          actors.push(new Actor(role, this))
         }
       }
     }
@@ -116,17 +146,5 @@ export default class Director {
 
   _getPlayer() {
     return this._getActorByRoleID(this.playerRoleID)
-  }
-
-  onPause() {
-
-  }
-
-  onResume() {
-
-  }
-
-  onDestory() {
-
   }
 }

@@ -2,8 +2,9 @@ import wepy from 'wepy'
 import EventBus from './EventBus.js'
 
 export default class Actor {
-  constructor(role) {
+  constructor(role, director) {
     this.role = role
+    this.director = director
   }
 
   getID() {
@@ -11,9 +12,7 @@ export default class Actor {
   }
 
   async prepare(line) {
-    wepy.setNavigationBarTitle({
-      title: '对方正在输入...'
-    })
+    EventBus.publish(EventBus.Events.SetTitle, '对方正在输入...')
     let delay = this._calcTypingTime(line)
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -23,9 +22,7 @@ export default class Actor {
   }
 
   act(line) {
-    wepy.setNavigationBarTitle({
-      title: ''
-    })
+    this.director.setTitleWithChapterName()
     EventBus.publish(EventBus.Events.ActionFinish, {
       role: this.role,
       line: line

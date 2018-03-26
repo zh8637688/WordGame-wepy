@@ -70,7 +70,6 @@ export default class Index extends wepy.page {
     },
     bindTap() {
       this.collapseControlBar(true)
-      this.director.action()
     }
   }
 
@@ -95,14 +94,7 @@ export default class Index extends wepy.page {
   }
 
   onSetSelection = (arg) => {
-    if (this.needGuide) {
-      this.showToastDelay('点击 “回复” 选择对话')
-      this.needGuide = false
-      wepy.setStorage({
-        key: 'key_no_guide',
-        data: true
-      })
-    }
+    this.showToastDelay('点击 “回复” 选择对话')
     let selections = arg.selections
     let selectionString = []
     for (let idx in selections) {
@@ -114,7 +106,6 @@ export default class Index extends wepy.page {
   }
 
   onLoad(options) {
-    this.needGuide = !wepy.getStorageSync('key_no_guide')
     EventBus.subscribe(EventBus.Events.ActionFinish, this.onActionFinish)
     EventBus.subscribe(EventBus.Events.SetSelection, this.onSetSelection)
     EventBus.subscribe(EventBus.Events.SetTitle, this.onSetTitle)
@@ -126,6 +117,7 @@ export default class Index extends wepy.page {
     EventBus.unsubscribe(EventBus.Events.ActionFinish, this.onActionFinish)
     EventBus.unsubscribe(EventBus.Events.SetSelection, this.onSetSelection)
     EventBus.unsubscribe(EventBus.Events.SetTitle, this.onSetTitle)
+    this.director.stop()
   }
 
   activeControlBar(flag) {
@@ -166,7 +158,7 @@ export default class Index extends wepy.page {
   }
 
   showToastDelay(toast) {
-    this.showToast(toast, 1000)
+    this.showToast(toast, 1500)
   }
 
   showToast(toast, delay) {
