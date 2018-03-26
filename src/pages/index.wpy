@@ -58,6 +58,7 @@ export default class Index extends wepy.page {
     EventBus.registerEvent('SetSelection')
     EventBus.registerEvent('ChooseSelection')
     EventBus.registerEvent('SetTitle')
+    EventBus.registerEvent('Restart')
   }
 
   methods = {
@@ -106,10 +107,16 @@ export default class Index extends wepy.page {
     this.$apply()
   }
 
+  onRestart = () => {
+    this.clearMsgList()
+    this.activeControlBar(false)
+  }
+
   onLoad(options) {
     EventBus.subscribe(EventBus.Events.ActionFinish, this.onActionFinish)
     EventBus.subscribe(EventBus.Events.SetSelection, this.onSetSelection)
     EventBus.subscribe(EventBus.Events.SetTitle, this.onSetTitle)
+    EventBus.subscribe(EventBus.Events.Restart, this.onRestart)
     this.director.prepare()
     this.director.action()
   }
@@ -118,6 +125,7 @@ export default class Index extends wepy.page {
     EventBus.unsubscribe(EventBus.Events.ActionFinish, this.onActionFinish)
     EventBus.unsubscribe(EventBus.Events.SetSelection, this.onSetSelection)
     EventBus.unsubscribe(EventBus.Events.SetTitle, this.onSetTitle)
+    EventBus.unsubscribe(EventBus.Events.Restart, this.onRestart)
     this.director.stop()
   }
 
@@ -156,6 +164,11 @@ export default class Index extends wepy.page {
 
   pullMsgList(msgList) {
     this.messages = msgList.concat(this.messages)
+  }
+
+  clearMsgList() {
+    this.messages = []
+    this.$apply()
   }
 
   showToastDelay(toast) {

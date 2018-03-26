@@ -22,13 +22,17 @@ export default class Player extends Actor {
     EventBus.publish(EventBus.Events.SetSelection, {
       selections: line.selections
     })
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       let onChooseSelection = (arg) => {
         EventBus.unsubscribe(EventBus.Events.ChooseSelection, onChooseSelection)
         let selection = line.selections[arg]
-        line.content = selection.content
-        line.goto = selection.goto
-        resolve()
+        if (selection.restart) {
+          reject()
+        } else {
+          line.content = selection.content
+          line.goto = selection.goto
+          resolve()
+        }
       }
       EventBus.subscribe(EventBus.Events.ChooseSelection, onChooseSelection)
     })

@@ -20,11 +20,16 @@ export default class Director {
   }
 
   async action() {
+    let that = this
     this.stop = false
     while (!this.stop && this.linesOfChapter && this.curLineIdx < this.linesOfChapter.length) {
       let line = this.linesOfChapter[this.curLineIdx]
-      await this._dispatchLine(line)
-      this.curLineIdx = this._getNextLineIdx()
+      await this._dispatchLine(line).then(() => {
+        that.curLineIdx = this._getNextLineIdx()
+      }).catch(() => {
+        EventBus.publish(EventBus.Events.Restart)
+        that.curLineIdx = 0
+      })
     }
   }
 
