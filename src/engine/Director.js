@@ -104,7 +104,7 @@ export default class Director {
   _createIndexOfLines(lines) {
     let indexMap = new Map()
     if (lines) {
-      for (let index in lines) {
+      for (let index = 0; index < lines.length; index++) {
         let line = lines[index]
         if (line.id) {
           indexMap.set(line.id, index)
