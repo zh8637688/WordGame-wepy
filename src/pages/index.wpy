@@ -88,6 +88,7 @@ export default class Index extends wepy.page {
       type: arg.line.contentType ? arg.line.contentType : 0,
       fromMe: arg.role.fromMe
     })
+    this.hideToast()
     this.activeControlBar(false)
     this.scrollToBottom()
     this.$apply()
