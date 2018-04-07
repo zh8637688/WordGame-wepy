@@ -21,3 +21,36 @@ wepy build
 
 ### 4.预览
 在微信开发工具中导入项目，项目路径为`dist`目录
+
+
+### 游戏剧本
+```
+Scripts = {
+  // 游戏角色列表
+  roles: [{
+    id: 0,          // 角色id
+    name: 'X',      // 角色名称
+    avatar: ''      // 角色头像
+  }],
+  playerRoleID: 0,  // 玩家扮演的角色id
+  chapters: [{
+    name: '第一章',  // 章节名称
+    lines: [{       // 台词
+      roleID: 0,
+      content: 'https://xxx.png',
+      contentType: 1,   // 台词类型，0表示文本，1表示图片
+      goto: '剧本2'      // 下一条台词的id
+    }, {
+      id: '剧本2'
+      roleID: 1,
+      selections: [{    // 玩家的选项
+        content: '跳转到第二条剧本',
+        goto: '剧本3'
+      }, {
+        content: '跳转到第三条剧本',
+        goto: '剧本4'
+      }]
+    }]
+  }]
+}
+```
